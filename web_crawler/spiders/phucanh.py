@@ -28,3 +28,5 @@ class ScreensSpider(CrawlSpider):
         self.log(f'Saved file: {filename}')
         with open(filename, 'wb') as f:
             f.write(response.body)
+
+        self.log(f'Saved file {filename}')
