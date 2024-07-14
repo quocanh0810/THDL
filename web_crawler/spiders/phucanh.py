@@ -10,12 +10,12 @@ class ScreensSpider(CrawlSpider):
 
     rules = (
         # Rule link các sản phẩm
-        Rule(LinkExtractor(restrict_xpaths='//li[@class="p-item-group "]//a[@class="p-img"]'), callback='parse_item', follow=True),
+        Rule(LinkExtractor(restrict_xpaths='//li[@class="p-item-group "]//a[@class="p-img"]'), callback='parse_product', follow=True),
         # Rule link phân trang
         Rule(LinkExtractor(restrict_xpaths='//div[@class="paging"]//a'), follow=True),
     )
 
-    def parse_item(self, response):
+    def parse_product(self, response):
         domain = response.url.split("/")[2]
         folder_name = 'web/phucanh'
 
