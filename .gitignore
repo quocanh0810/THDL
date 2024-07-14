@@ -2,3 +2,5 @@
 *.vscode
 *.json
 *.html
+__pycache__/
+spiders/__pycache__/
