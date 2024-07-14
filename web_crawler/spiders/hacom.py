@@ -1,24 +1,53 @@
-import json
-import os
 import scrapy
-import time
+import requests
+import os
 
 class HacomSpider(scrapy.Spider):
     name = "hacom"
+    api_url = 'https://hacom.vn/ajax/get_json.php'
+    headers = {'Content-Type': 'application/json'}
+    
+    params_template = {
+        'action': 'product',
+        'action_type': 'product-list',
+        'category': '1589',
+        'show': 40,
+        'page': 1
+    }
 
-    with open('web/hacom/products.json', 'r', encoding='utf-8') as f:
-        products = json.load(f)
+    def start_requests(self):
+        page = 1
+        while True:
+            params = self.params_template.copy()
+            params['page'] = page
+            response = requests.get(self.api_url, headers=self.headers, params=params)
+            try:
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                self.log(f"HTTPError: {e.response.status_code} - {e.response.text}")
+                break
 
-    start_urls = [f"https://hacom.vn{product['productUrl']}" for product in products if 'productUrl' in product]
+            data = response.json()
+            products = data.get('list', [])
+            if not products:
+                self.log(f'No products found on page {page}')
+                break
 
-    def parse(self, response):
+            for product in products:
+                if 'productUrl' in product:
+                    product_url = f"https://hacom.vn{product['productUrl']}"
+                    yield scrapy.Request(url=product_url, callback=self.parse_product)
+            
+            page += 1
+
+    def parse_product(self, response):
         url_path = response.url.split("/")[-1]
-        filename = f"web/hacom/{url_path}.html"
+        folder_name = 'web/hacom'
+        filename = os.path.join(folder_name, f"{url_path}.html")
         
-        os.makedirs('web/hacom', exist_ok=True)
+        os.makedirs(folder_name, exist_ok=True)
         
         with open(filename, 'wb') as f:
             f.write(response.body)
         
         self.log(f'Saved file {filename}')
-        time.sleep(2)
