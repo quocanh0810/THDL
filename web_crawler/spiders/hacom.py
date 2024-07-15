@@ -1,6 +1,8 @@
-import scrapy
 import requests
-import os
+import scrapy
+
+from ..items import Website
+
 
 class HacomSpider(scrapy.Spider):
     name = "hacom"
@@ -41,13 +43,5 @@ class HacomSpider(scrapy.Spider):
             page += 1
 
     def parse_product(self, response):
-        url_path = response.url.split("/")[-1]
-        folder_name = 'web/hacom'
-        filename = os.path.join(folder_name, f"{url_path}.html")
+        yield {"web": Website.cellphones, "data": response.text}
         
-        os.makedirs(folder_name, exist_ok=True)
-        
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        
-        self.log(f'Saved file {filename}')

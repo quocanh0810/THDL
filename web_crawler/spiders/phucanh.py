@@ -1,7 +1,8 @@
-import scrapy
-from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-import os
+from scrapy.spiders import CrawlSpider, Rule
+
+from ..items import Website
+
 
 class ScreensSpider(CrawlSpider):
     name = 'phucanh'
@@ -16,17 +17,4 @@ class ScreensSpider(CrawlSpider):
     )
 
     def parse_product(self, response):
-        domain = response.url.split("/")[2]
-        folder_name = 'web/phucanh'
-
-        if not os.path.exists(folder_name):
-            os.makedirs(folder_name)
-
-        product_id = response.url.split("/")[-1].replace('.html', '')
-        filename = os.path.join(folder_name, f'full_html_{product_id}.html')
-
-        self.log(f'Saved file: {filename}')
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-
-        self.log(f'Saved file {filename}')
+        yield {"web": Website.phucanh, "data": response.text}
