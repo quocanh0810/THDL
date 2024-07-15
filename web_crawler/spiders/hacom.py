@@ -32,7 +32,7 @@ class HacomSpider(scrapy.Spider):
             data = response.json()
             products = data.get('list', [])
             if not products:
-                self.log(f'No products found on page {page}')
+                self.log(f'No products found on pages {page}')
                 break
 
             for product in products:
