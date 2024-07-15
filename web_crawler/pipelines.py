@@ -5,9 +5,13 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
 
-
-class WebCrawlerPipeline:
+class ParsePipeline:
     def process_item(self, item, spider):
+        item["data"] = item["data"].replace("\n", "").replace(" ", "")
         return item
+
+class ExtractPipeline:
+    def process_item(self, item, spider):        
+        return item
+ 
