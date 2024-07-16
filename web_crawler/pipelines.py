@@ -39,8 +39,8 @@ class ExtractPipeline:
                 spider.logger.error(f"Got weird website: {web}. Only support: {[e.value for e in Website]}")
         except Exception as e:
             spider.logger.error(f"Extracting pipeline error: {e}")
-            file_name: str = data["url"].split('/')[-1]
-            file_name = file_name + ".html" if file_name.endswith(".html") else file_name
+            file_name: str = item["url"].split('/')[-1]
+            file_name = file_name if file_name.endswith(".html") else file_name + ".html"
             with open(os.path.join(self.error_dir, web.value, file_name), 'w') as f:
                 f.write(item["data"])
 
