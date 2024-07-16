@@ -12,6 +12,6 @@ class ParsePipeline:
         return item
 
 class ExtractPipeline:
-    def process_item(self, item, spider):        
+    def process_item(self, item, spider):
         return item
  
