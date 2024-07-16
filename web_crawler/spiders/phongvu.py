@@ -48,4 +48,4 @@ class PhongVuSpider(scrapy.Spider):
             page += 1
 
     def parse_product(self, response):
-        yield {"web": Website.phongvu, "data": response.text}
+        yield {"web": Website.phongvu, "data": response.text, "url": response.url}

@@ -4,7 +4,7 @@ from scrapy.spiders import CrawlSpider, Rule
 from ..items import Website
 
 
-class ScreensSpider(CrawlSpider):
+class PhucanhSpider(CrawlSpider):
     name = 'phucanh'
     allowed_domains = ['phucanh.vn']
     start_urls = ['https://www.phucanh.vn/man-hinh-may-tinh.html']
@@ -17,4 +17,4 @@ class ScreensSpider(CrawlSpider):
     )
 
     def parse_product(self, response):
-        yield {"web": Website.phucanh, "data": response.text}
+        yield {"web": Website.phucanh, "data": response.text, "url": response.url}
