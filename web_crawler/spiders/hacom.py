@@ -43,5 +43,5 @@ class HacomSpider(scrapy.Spider):
             page += 1
 
     def parse_product(self, response):
-        yield {"web": Website.cellphones, "data": response.text}
+        yield {"web": Website.hacom, "data": response.text}
         

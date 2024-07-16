@@ -1,7 +1,8 @@
-import scrapy
 import requests
-import json
-import os
+import scrapy
+
+from ..items import Website
+
 
 class PhongVuSpider(scrapy.Spider):
     name = "phongvu"
@@ -47,13 +48,4 @@ class PhongVuSpider(scrapy.Spider):
             page += 1
 
     def parse_product(self, response):
-        url_path = response.url.split("/")[-1]
-        folder_name = 'web/phongvu'
-        filename = os.path.join(folder_name, f"{url_path}.html")
-        
-        os.makedirs(folder_name, exist_ok=True)
-        
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        
-        self.log(f'Saved file {filename}')
+        yield {"web": Website.phongvu, "data": response.text}
