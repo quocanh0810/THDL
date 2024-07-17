@@ -95,7 +95,7 @@ class PreprocessPipeline:
             item.price = int(item.price)
 
         # Brand
-        item.brand = item.brand.upper()
+        item.brand = item.brand.upper().replace("\"", "")
 
         return item
 class MongoPipeline:

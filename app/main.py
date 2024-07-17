@@ -21,8 +21,8 @@ def search_monitors(filters):
   filter_dict = {}
   for field, field_info in filters.items():
     filter_dict[field] = {"$gte": field_info[0], "$lte": field_info[1]}
-
-  return list(collection.find(filter_dict))
+  
+  return list(collection.find(filter_dict).sort({"price": 1}))
 
 @st.cache_data(ttl=60)
 def get_search_range():
@@ -64,12 +64,12 @@ if st.button("Search"):
             col = container.columns(2)
             
             col[0].write(f"**Size:** {monitor['size']} Inch")
-            col[0].write(f"**Price:** {monitor['price']} VND")
+            col[0].write(f"**Price:** {monitor['price']:,} VND")
             col[0].write(f"**Brand:** {monitor['brand']}")
             col[0].write(f"**Resolution:** {monitor['reso']}")
             col[0].write(f"**LCD:** {monitor['lcd_type']}")
             col[0].write(f"**Frequency:** {monitor['freq']} Hz")
             col[0].write(f"**Luminance:** {monitor['lumi']} nits")
-
+            col[0].write(f"**Ports:** {', '.join(monitor['port'])}")
             col[0].write(f"[Product Page]({monitor['url']})")  # Link to product page
             col[1].image(monitor['img'])
