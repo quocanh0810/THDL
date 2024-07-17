@@ -55,12 +55,12 @@ class PreprocessPipeline:
         # Size
         size_search = re.findall('\d+\.\d*|\.?\d+', item.size)
         if size_search:
-            item.size = size_search[0]
+            item.size = size_search[0]+"inch"
         
         # Resolution
         reso_search = re.findall('\d+[\*x]\d+', item.reso.replace(" ",""))
         if reso_search:
-            item.reso = size_search[0].replace("*", "x")
+            item.reso = reso_search[0].replace("*", "x")
 
         # LCD type
         item.lcd_type = item.lcd_type.strip()
@@ -73,23 +73,23 @@ class PreprocessPipeline:
         # Response rate
         rsp_search = re.findall('\d+', item.rsp_rate)
         if rsp_search:
-            item.freq = rsp_search[0]+"ms"
+            item.rsp_rate = (rsp_search[0]+"ms").replace(" ", "")
 
         # Luminance
         lumi_search = re.findall('\d+', item.lumi)
         if lumi_search:
-            item.freq = lumi_search[0]+"nits"
+            item.lumi = (lumi_search[0]+"nits").replace(" ", "")
 
         # Constrast rate
         if item.constr_rate != "":
-            item.constr_rate = item.constr_rate.split(":")[0].replace(",","").replace(".","")+":1"
+            item.constr_rate = item.constr_rate.split(":")[0].replace(",","").replace(".","").strip()+":1"
 
         # Port
         if item.port != "":
             item.port = item.port.replace(" ", "").split(",")
 
         # Price
-        if item.price == "":
+        if item.price == "0":
             item.price = None
 
         return item
@@ -114,6 +114,8 @@ class MongoPipeline:
     def close_spider(self, spider):
         self.client.close()
 
-    def process_item(self, item, spider):
-        self.db[self.collection_name].insert_one(item.asdict())
+    def process_item(self, item: Monitor, spider):
+        if not item.isEmpty():
+            self.db[self.collection_name].insert_one(item.asdict())
+        
         return item
