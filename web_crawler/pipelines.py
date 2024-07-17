@@ -55,7 +55,7 @@ class PreprocessPipeline:
         # Size
         size_search = re.findall('\d+\.\d*|\.?\d+', item.size)
         if size_search:
-            item.size = size_search[0]+"inch"
+            item.size = float(size_search[0])
         
         # Resolution
         reso_search = re.findall('\d+[\*x]\d+', item.reso.replace(" ",""))
@@ -68,17 +68,17 @@ class PreprocessPipeline:
         # Frequency
         freq_search = re.findall('\d+', item.freq)
         if freq_search:
-            item.freq = freq_search[0]+"Hz"
+            item.freq = int(freq_search[0])
 
         # Response rate
         rsp_search = re.findall('\d+', item.rsp_rate)
         if rsp_search:
-            item.rsp_rate = (rsp_search[0]+"ms").replace(" ", "")
+            item.rsp_rate = int((rsp_search[0]).replace(" ", ""))
 
         # Luminance
         lumi_search = re.findall('\d+', item.lumi)
         if lumi_search:
-            item.lumi = (lumi_search[0]+"nits").replace(" ", "")
+            item.lumi = int((lumi_search[0]).replace(" ", ""))
 
         # Constrast rate
         if item.constr_rate != "":
@@ -89,8 +89,13 @@ class PreprocessPipeline:
             item.port = item.port.replace(" ", "").split(",")
 
         # Price
-        if item.price == "0":
+        if item.price in ("0", ""):
             item.price = None
+        else:
+            item.price = int(item.price)
+
+        # Brand
+        item.brand = item.brand.upper()
 
         return item
 class MongoPipeline:
@@ -116,6 +121,10 @@ class MongoPipeline:
 
     def process_item(self, item: Monitor, spider):
         if not item.isEmpty():
-            self.db[self.collection_name].insert_one(item.asdict())
-        
+            c = self.db[self.collection_name] 
+
+            # Check duplication
+            if c.count_documents({"url": item.url}) == 0:
+                c.insert_one(item.asdict())
+
         return item
