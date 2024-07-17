@@ -40,6 +40,7 @@ class Monitor:
     price: str=""
     url: str=""
     brand: str=""
+    img: str=""
 
     def asdict(self) -> dict:
         return asdict(self)
@@ -66,8 +67,9 @@ def process_hacom(data: str):
     price = b["offers"]["price"]
     url = b["offers"]["url"]
     brand = b["brand"]["name"]
+    img = b["image"]
 
-    return Monitor(size, reso, lcd_type, freq, rsp_rate, lumi, constr_rate, port, price, url, brand)    
+    return Monitor(size, reso, lcd_type, freq, rsp_rate, lumi, constr_rate, port, price, url, brand, img)    
 
 def process_phongvu(data: str):
     stalker = Stalker(data)
@@ -80,6 +82,7 @@ def process_phongvu(data: str):
     monitor.price = stats["offers"]["price"]
     monitor.url = stats["offers"]["url"]
     monitor.brand = stats["brand"]["name"]
+    monitor.img = stats["image"]
 
     for p in stats["additionalProperty"]:
         n = p["name"]
@@ -112,9 +115,11 @@ def process_phucanh(data: str):
     
     size = stats.skipTo("Kich thuoc man hinh").skipTo(":").backTo("</td>").data
 
-    reso = stats.skipTo("Do phan giai").skipTo(":").backTo("</td>").data
+    reso = stats.skipTo("Do phan giai").skipTo(":").backTo("</td>")
     if "</a>" in reso.data:
         reso = reso.skipTo(">").backTo("</a>").data
+    else:
+        reso = reso.data
 
     lcd_type = stats.skipTo("Tam nen").skipTo(":").skipTo(">").backTo("</a>").data
     freq = stats.skipTo("Tan so quet").skipTo(":").skipTo(">").backTo("</a>").data
@@ -127,8 +132,9 @@ def process_phucanh(data: str):
     price = b["offers"]["price"]
     url = b["offers"]["url"]
     brand = stalker.skipTo("item_brand:").backTo(",").data
+    img = b["image"]
 
-    return Monitor(size, reso, lcd_type, freq, rsp_rate, lumi, constr_rate, port, price, url, brand)   
+    return Monitor(size, reso, lcd_type, freq, rsp_rate, lumi, constr_rate, port, price, url, brand, img)   
 
 if __name__ == "__main__":
     # with open("./web/hacom/sample.html", "r") as f:
