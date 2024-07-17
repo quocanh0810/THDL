@@ -16,8 +16,6 @@ search_fields = {
     "size": {"type": "int", "label": "Size (inch)"},  # Field information
     "price": {"type": "int", "label": "Price (VND)"},  # Price as integer
 }
-max_col = 3
-
 
 def search_monitors(filters):
   filter_dict = {}
@@ -53,7 +51,7 @@ for field, field_info in search_fields.items():
         ],
     )
 
-st.title("Screen Search Engine with Filters")
+st.title("Buy a Monitor!!!")
 
 # Perform search if query is not empty
 if st.button("Search"):
@@ -63,7 +61,15 @@ if st.button("Search"):
         st.subheader("Search Results:")
         for monitor in results:
             container = st.container(border=True)
-            container.write(f"**Size:** {monitor['size']}")
-            container.write(f"**Resolution:** {monitor['reso']}")
-            container.write(f"**Brand:** {monitor['brand']}")
-            container.write(f"[Product Page]({monitor['url']})")  # Link to product page
+            col = container.columns(2)
+            
+            col[0].write(f"**Size:** {monitor['size']} Inch")
+            col[0].write(f"**Price:** {monitor['price']} VND")
+            col[0].write(f"**Brand:** {monitor['brand']}")
+            col[0].write(f"**Resolution:** {monitor['reso']}")
+            col[0].write(f"**LCD:** {monitor['lcd_type']}")
+            col[0].write(f"**Frequency:** {monitor['freq']} Hz")
+            col[0].write(f"**Luminance:** {monitor['lumi']} nits")
+
+            col[0].write(f"[Product Page]({monitor['url']})")  # Link to product page
+            col[1].image(monitor['img'])
