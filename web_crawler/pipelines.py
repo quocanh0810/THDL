@@ -6,6 +6,9 @@
 
 # useful for handling different item types with a single interface
 import os
+import re
+
+import pymongo
 
 from .items import Website
 from .stalkers import Monitor, process_hacom, process_phongvu, process_phucanh
@@ -47,6 +50,70 @@ class ExtractPipeline:
         spider.logger.info(f"Got monitor: {monitor}")
         return monitor
 
+class PreprocessPipeline:
+    def process_item(self, item: Monitor, spider):
+        # Size
+        size_search = re.findall('\d+\.\d*|\.?\d+', item.size)
+        if size_search:
+            item.size = size_search[0]
+        
+        # Resolution
+        reso_search = re.findall('\d+[\*x]\d+', item.reso.replace(" ",""))
+        if reso_search:
+            item.reso = size_search[0].replace("*", "x")
+
+        # LCD type
+        item.lcd_type = item.lcd_type.strip()
+
+        # Frequency
+        freq_search = re.findall('\d+', item.freq)
+        if freq_search:
+            item.freq = freq_search[0]+"Hz"
+
+        # Response rate
+        rsp_search = re.findall('\d+', item.rsp_rate)
+        if rsp_search:
+            item.freq = rsp_search[0]+"ms"
+
+        # Luminance
+        lumi_search = re.findall('\d+', item.lumi)
+        if lumi_search:
+            item.freq = lumi_search[0]+"nits"
+
+        # Constrast rate
+        if item.constr_rate != "":
+            item.constr_rate = item.constr_rate.split(":")[0].replace(",","").replace(".","")+":1"
+
+        # Port
+        if item.port != "":
+            item.port = item.port.replace(" ", "").split(",")
+
+        # Price
+        if item.price == "":
+            item.price = None
+
+        return item
 class MongoPipeline:
+    collection_name = "scrapy_items"
+
+    def __init__(self, mongo_uri, mongo_db):
+        self.mongo_uri = mongo_uri
+        self.mongo_db = mongo_db
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri=crawler.settings.get("MONGO_URI"),
+            mongo_db=crawler.settings.get("MONGO_DATABASE", "items"),
+        )
+
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.db = self.client[self.mongo_db]
+
+    def close_spider(self, spider):
+        self.client.close()
+
     def process_item(self, item, spider):
-        pass
+        self.db[self.collection_name].insert_one(item.asdict())
+        return item

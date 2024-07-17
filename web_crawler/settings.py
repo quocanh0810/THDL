@@ -65,6 +65,8 @@ ROBOTSTXT_OBEY = True
 ITEM_PIPELINES = {
    "web_crawler.pipelines.ParsePipeline": 100,
    "web_crawler.pipelines.ExtractPipeline": 200,
+   "web_crawler.pipelines.PreprocessPipeline": 300,
+   "web_crawler.pipelines.MongoPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -100,3 +102,6 @@ AUTOTHROTTLE_START_DELAY = 1
 AUTOTHROTTLE_MAX_DELAY = 10
 AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 AUTOTHROTTLE_DEBUG = False
+
+MONGO_URI = "mongodb://mongo:password@localhost:27017"
+LOG_LEVEL = "INFO"
